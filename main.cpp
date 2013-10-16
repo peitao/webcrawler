@@ -4,8 +4,8 @@
 #include <fstream>
 #include <iostream>
 
+#include "urls.h"
 #include "util.h"
-
 using namespace std;
 
 /* config */
@@ -33,6 +33,7 @@ int main (int argc, char const* argv[])
 		string c_url_str = url_queue.front();
 		const char * c_url = c_url_str.c_str();
 		url_queue.pop();
+		
 		/* 抓取 */
 		cout << "fetching... " << c_url <<"\n";
 		size_t page_size = fetch_url(buffer,c_url);
@@ -62,7 +63,12 @@ int main (int argc, char const* argv[])
 		/* 将新的url加入到队列尾部 */
 		for (size_t i = 0; i < new_urls.size(); i++ )
 		{
-			url_queue.push( new_urls[i] );
+			/* 判断url是否重复 */
+			if ( url_exist( new_urls[i] ) == false )
+			{
+				url_queue.push( new_urls[i] );
+				url_add( new_urls[i] );
+			}
 		}
 		
 	}

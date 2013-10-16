@@ -54,7 +54,7 @@ bool is_root_path(const char * url)
 {
 	return ! (strstr( url, "http" ) == NULL);
 }
-
+/* return the host name of an url */
 string get_host_name(const char * url)
 {
 	if ( strlen(url) < 2)  return string();
@@ -79,7 +79,7 @@ string get_host_name(const char * url)
 	
 	return string( start, to );
 }
-
+/* pick out the first url that begin from start */
 string pick_url(const char * start)
 {
 	const char * from = start;
