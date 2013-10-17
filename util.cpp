@@ -1,6 +1,14 @@
 #include <iostream>
-#include <string.h>
 #include <curl/curl.h>
+#include <queue>
+#include <string>
+#include <fstream>
+#include <iostream>
+#include <string.h>
+#include <string.h>
+#include <errno.h>
+#include <pthread.h>
+#include "urls.h"
 #include "util.h"
 
 using namespace std;
@@ -10,6 +18,7 @@ struct buffer_internel
 	void * data_buffer;
 };
 
+/* libcurl的回调函数，向数据缓冲区中写入读取到的page */
 static size_t write_data( void *buffer, size_t size, size_t nmemb, void *pbuf )
 {
 	buffer_internel * pbuf_in = (buffer_internel *)pbuf;
@@ -26,8 +35,12 @@ static size_t write_data( void *buffer, size_t size, size_t nmemb, void *pbuf )
 	return total_size;
 }
 
+/* 利用libcurl库读取一个url页面，因为libcurl是线程安全的。所以这个函数是线程安全的 */
 size_t fetch_url( void * data_buffer, const char * url )
 {	
+	MYDEBUG(url);
+	MYDEBUG("hhhhhhh");
+
 	/* 数据buffer和读取到的数据大小 */
 	buffer_internel buf_in = {0,data_buffer};
 	
@@ -135,6 +148,18 @@ void parse_page(const char * url, const char * buffer, size_t page_size, vector<
 
 }
 
+/* 把一个buffer保存到文件中 */
+void save_page( string curl, char * buffer, size_t file_no )
+{
+	char filename[100];
+
+	sprintf( filename, "%s%u", save_file_prefix, file_no );
+
+	ofstream file( filename );
+
+	file << curl  << "\n" << buffer;	
+}
+
 void test_main_util(int argc, char const* argv[])
 {
 	/*测试fetch_url
@@ -160,6 +185,11 @@ void test_main_util(int argc, char const* argv[])
 	
 }
 
+void debug(string str)
+{
+	return ;
+	std::cerr << str <<endl;
+}
 
 
 

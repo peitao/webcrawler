@@ -1,81 +1,135 @@
 #include <curl/curl.h>
+#include <stdlib.h>
 #include <queue>
 #include <string>
 #include <fstream>
 #include <iostream>
-
+#include <string.h>
+#include <errno.h>
+#include <pthread.h>
 #include "urls.h"
 #include "util.h"
+#include "config.h"
 using namespace std;
 
-/* config */
-const char * seed_url = "hao.360.cn";
-char * save_file_prefix = "../save/page";
+/* 子线程的ID数组 */
+pthread_t child_threads[thread_numbers];
 
-/* implement config */
-char buffer[1024*1024*20];
+/* 程序需要使用所有互斥锁 */
+pthread_mutex_t total_pages_lock;
+pthread_mutex_t url_queue_lock;
+pthread_mutex_t mDB_lock;
 
-/* 待抓取的url队列 */
-queue<string> url_queue;
+/* 初始化所有互斥锁 */
+void init_all_lock()
+{
+	if ( pthread_mutex_init( &total_pages_lock, NULL ) )
+		cout << "Init lock fail.." << endl;
+
+	if ( pthread_mutex_init( &url_queue_lock, NULL ) )
+		cout << "Init lock fail.." << endl;
+
+	if ( pthread_mutex_init( &mDB_lock, NULL ) )
+		cout << "Init lock fail.." << endl;
+}
+
+/* 统计信息 */
+size_t total_pages = 0;
+/* 获得目前抓取到总页面数（也作为保存页面的文件名字）*/
+size_t get_and_inc()
+{
+	pthread_mutex_lock( &total_pages_lock );
+
+	size_t ret = total_pages++;
+
+	pthread_mutex_unlock( &total_pages_lock );
+
+	return ret;
+}
+
+void * worker ( void * p )
+{
+	MYDEBUG("start a child thread");
+
+	char * buffer = (char*)malloc( PAGE_BUFF_SIZE );
+	
+	if ( buffer == NULL )
+		MYDEBUG("malloc ERROR!");
+		
+
+	while ( 1 )
+	{
+		/* 获得一个待抓取的url */
+		pthread_mutex_lock( &url_queue_lock );
+		string curl = url_get_url();
+		pthread_mutex_unlock( &url_queue_lock );
+
+		if ( curl.size() == 0 ) continue;
+
+		/* 抓取当前url */
+		size_t page_size = fetch_url( buffer, curl.c_str() );
+
+		if ( page_size == 0 )
+		{	
+			continue;
+		}
+
+		buffer[page_size] = '\0';
+
+		/* 保存页面 */
+		size_t number = get_and_inc();
+
+		save_page( curl, buffer, number );
+
+		/* 分析页面 */
+		vector<string> new_urls; 
+		
+		parse_page( curl.c_str(), buffer, page_size, new_urls );
+
+		/* 将urls加入到全局队列，这里使用url_queue_lock。 */
+		pthread_mutex_lock( &url_queue_lock );
+		url_put_urls ( new_urls );
+		pthread_mutex_unlock( &url_queue_lock );
+	}
+
+	free( buffer );
+}
+
 int main (int argc, char const* argv[])
 {
 	
-	/* 将种子url放到队列中 */
-	url_queue.push( seed_url );
+	/* 初始化锁 */
+	init_all_lock();
 
-	/* 统计信息 */
-	size_t total_pages = 0;
-	
-	while ( !url_queue.empty() )
+	MYDEBUG("init lock done");
+
+	vector< string > seeds;
+	seeds.push_back( seed_url );
+	url_put_urls ( seeds );
+
+	/* 启动worker线程们 */	
+	for ( size_t i = 0; i < thread_numbers; i++ )
 	{
-
-		/* 当前抓取的url */
-		string c_url_str = url_queue.front();
-		const char * c_url = c_url_str.c_str();
-		url_queue.pop();
-		
-		/* 抓取 */
-		cout << "fetching... " << c_url <<"\n";
-		size_t page_size = fetch_url(buffer,c_url);
-		buffer[page_size] = '\0';
-		
-		/* 失败 */
-		if( page_size == 0 ) 
-		{ 
-			cout << "fail.."<<endl;
-			continue; 
-		}
-		else
+		int err = pthread_create ( child_threads + i, NULL, worker, NULL );
+		if ( err )
 		{
-			cout << "succeed.."<<endl;
+			cout << "Can not create thread: " << strerror( err ) 
+			<< endl;
+			return 1;
 		}
-		
-		/* 保存page到文件中去 */
-		char filename[100];
-		sprintf( filename, "%s%u", save_file_prefix, total_pages++ );
-		ofstream file( filename );
-		file << c_url << "\n" << buffer;
-		
-		/* 分析页面，获得新的url */
-		vector<string> new_urls;
-		parse_page( c_url, buffer, page_size, new_urls );
-
-		/* 将新的url加入到队列尾部 */
-		for (size_t i = 0; i < new_urls.size(); i++ )
-		{
-			/* 判断url是否重复 */
-			if ( url_exist( new_urls[i] ) == false )
-			{
-				url_queue.push( new_urls[i] );
-				url_add( new_urls[i] );
-			}
-		}
-		
 	}
-	
+
+	MYDEBUG("create threads done");
+
+	/* 等待所有子进程结束 */
+	void * tret;
+	for ( size_t i = 0; i < thread_numbers; i++ )
+	{
+		pthread_join( child_threads[i], &tret );
+	}
+
 	return 0;
 }
-
 
 
 
