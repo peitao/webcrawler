@@ -56,6 +56,7 @@ void * worker ( void * p )
 	if ( buffer == NULL )
 		MYDEBUG("malloc ERROR!");
 		
+	CURL * hander = curl_easy_init();
 
 	while ( 1 )
 	{
@@ -65,9 +66,11 @@ void * worker ( void * p )
 		pthread_mutex_unlock( &url_queue_lock );
 
 		if ( curl.size() == 0 ) continue;
+		
+		sleep(1);
 
 		/* 抓取当前url */
-		size_t page_size = fetch_url( buffer, curl.c_str() );
+		size_t page_size = fetch_url( buffer, curl.c_str(), hander );
 
 		if ( page_size == 0 )
 		{	

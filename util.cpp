@@ -36,18 +36,13 @@ static size_t write_data( void *buffer, size_t size, size_t nmemb, void *pbuf )
 }
 
 /* 利用libcurl库读取一个url页面，因为libcurl是线程安全的。所以这个函数是线程安全的 */
-size_t fetch_url( void * data_buffer, const char * url )
+size_t fetch_url( void * data_buffer, const char * url, CURL * curl )
 {	
 	MYDEBUG(url);
 	MYDEBUG("hhhhhhh");
 
 	/* 数据buffer和读取到的数据大小 */
 	buffer_internel buf_in = {0,data_buffer};
-	
-	/* 初始化curl库 */
-	CURL * curl = NULL;
-	if ( (curl = curl_easy_init()) == NULL )
-		cout << "curl_easy_init err" << endl;
 	
 	/* 设置curl的参数，url和回调函数 */
 	curl_easy_setopt( curl, CURLOPT_URL, url );
@@ -58,7 +53,6 @@ size_t fetch_url( void * data_buffer, const char * url )
 	if ( curl_easy_perform( curl ) )
 	 	cout << "curl_easy_perform err" << endl;
 	
-	curl_easy_cleanup( curl );
 
 	return buf_in.size;
 }
