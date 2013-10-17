@@ -15,10 +15,10 @@ char * save_file_prefix = "../save/page";
 /* implement config */
 char buffer[1024*1024*20];
 
+/* 待抓取的url队列 */
+queue<string> url_queue;
 int main (int argc, char const* argv[])
 {
-	/* 待抓取的url队列 */
-	queue<string> url_queue;
 	
 	/* 将种子url放到队列中 */
 	url_queue.push( seed_url );
