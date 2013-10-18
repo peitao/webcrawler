@@ -67,8 +67,6 @@ void * worker ( void * p )
 
 		if ( curl.size() == 0 ) continue;
 		
-		sleep(1);
-
 		/* 抓取当前url */
 		size_t page_size = fetch_url( buffer, curl.c_str(), hander );
 
@@ -109,6 +107,8 @@ int main (int argc, char const* argv[])
 	vector< string > seeds;
 	seeds.push_back( seed_url );
 	url_put_urls ( seeds );
+
+	curl_global_init(CURL_GLOBAL_ALL);
 
 	/* 启动worker线程们 */	
 	for ( size_t i = 0; i < thread_numbers; i++ )

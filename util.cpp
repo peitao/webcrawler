@@ -39,7 +39,7 @@ static size_t write_data( void *buffer, size_t size, size_t nmemb, void *pbuf )
 size_t fetch_url( void * data_buffer, const char * url, CURL * curl )
 {	
 	MYDEBUG(url);
-	MYDEBUG("hhhhhhh");
+	MYDEBUG("begin fetch");
 
 	/* 数据buffer和读取到的数据大小 */
 	buffer_internel buf_in = {0,data_buffer};
@@ -53,6 +53,7 @@ size_t fetch_url( void * data_buffer, const char * url, CURL * curl )
 	if ( curl_easy_perform( curl ) )
 	 	cout << "curl_easy_perform err" << endl;
 	
+	MYDEBUG("end fetch");
 
 	return buf_in.size;
 }
@@ -117,6 +118,7 @@ string pick_url(const char * start)
 
 void parse_page(const char * url, const char * buffer, size_t page_size, vector<string> & new_urls )
 {
+	MYDEBUG("begin-parse-page");
 	/* 提取主机名字，已便于将相对url转换为绝对url*/
 	string host_name = get_host_name( url );
 	
@@ -139,6 +141,8 @@ void parse_page(const char * url, const char * buffer, size_t page_size, vector<
 			new_urls.push_back( "http://" + host_name + url);
 		}
 	}
+
+	MYDEBUG("end-parse-page");
 
 }
 
@@ -165,6 +169,7 @@ void test_main_util(int argc, char const* argv[])
 	
 	cout << haha << endl;*/
 	
+
 	cout<<get_host_name("http://haha.com/")<<endl;
 	cout<<get_host_name("http://haha.com")<<endl;
 	cout<<get_host_name("haha.com/")<<endl;
@@ -181,7 +186,6 @@ void test_main_util(int argc, char const* argv[])
 
 void debug(string str)
 {
-	return ;
 	std::cerr << str <<endl;
 }
 

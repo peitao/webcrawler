@@ -12,9 +12,18 @@ static const string  seed_url = "hao.360.cn";
 static const char * save_file_prefix = "../save/page";
 
 /* 启动线程的个数 */
-static const size_t thread_numbers = 200;
+static const size_t thread_numbers = 10;
 
 /* 高级配置 */
 static const size_t PAGE_BUFF_SIZE = 1024*1024*5;
 
+const string forbidden[] = 
+{
+".tar",".gz",".tgz",".zip",".Z",".rpm",".deb"
+,".ps",".dvi",".pdf"
+," .png",".jpg",".jpeg",".bmp",".smi",".tiff",".gif"
+,".mov",".avi"," .mpeg", ".mpg" ,".mp3" ,".qt" ,".wav" ,".ram" ,".rm"
+,".jar", ".java", ".class", ".diff"
+,".doc", ".xls", ".ppt" ,".mdb" ,".rtf", ".exe", ".pps", ".so", ".psd"
+};
 #endif

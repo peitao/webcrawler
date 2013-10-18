@@ -15,4 +15,5 @@ string url_get_url();
 
 void url_put_urls( vector< string > & urls);
 
+void test_main_urls();
 #endif /* __URLS_H__ */
