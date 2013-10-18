@@ -1,6 +1,7 @@
 #include <queue>
 #include <string>
 #include <iostream>
+#include "testtime.h"
 #include "urls.h"
 #include "util.h"
 using namespace std;
@@ -22,6 +23,10 @@ string url_get_url()
 
 	string url = url_queue.front();
 	url_queue.pop();
+	
+	char buf[1024];
+	sprintf( buf, "queue_size = %u", url_queue.size() );
+	MYDEBUG(buf);
 
 	return url;
 }
@@ -64,7 +69,10 @@ void url_put_url( string url )
 
 void url_put_urls( vector< string > & urls)
 {
+	testtime("put urls uese");
+
 	MYDEBUG("begin put urls");
+
 	for ( size_t i = 0; i < urls.size(); i++ )
 	{
 		url_put_url( urls[i] );
