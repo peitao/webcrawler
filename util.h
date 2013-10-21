@@ -17,6 +17,9 @@ void parse_page(const char * url, const char * buffer, size_t page_size, vector<
 /* 把一个buffer保存到文件中 */
 void save_page( string curl, char * buffer, size_t file_no );
 
+/* hash函数 */
+size_t str_hash(const char * str, size_t seed );
+
 void test_main_util(int argc, char const* argv[]);
 
 /* Debug 函数 */

@@ -157,7 +157,16 @@ void save_page( string curl, char * buffer, size_t file_no )
 
 	file << curl  << "\n" << buffer;	
 }
-
+/* hash函数 */
+size_t str_hash(const char * str, size_t seed)
+{
+	size_t hash = 0;
+	while( * str )
+	{
+		hash = hash * seed + (*str++);
+	}
+	return ( hash & 0x7FFFFFFF );
+}
 void test_main_util(int argc, char const* argv[])
 {
 	/*测试fetch_url
@@ -186,6 +195,7 @@ void test_main_util(int argc, char const* argv[])
 
 void debug(string str)
 {
+	return ;
 	std::cerr << str <<endl;
 }
 

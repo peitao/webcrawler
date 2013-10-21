@@ -15,9 +15,12 @@ static const char * save_file_prefix = "../save/page";
 static const size_t thread_numbers = 10;
 
 /* 高级配置 */
+/* 32位最大512MB */
+static const size_t bloom_filter_size = 100 * 1024 * 1024;
+
 static const size_t PAGE_BUFF_SIZE = 1024*1024*5;
 
-const string forbidden[] = 
+static const string forbidden[] = 
 {
 ".tar",".gz",".tgz",".zip",".Z",".rpm",".deb"
 ,".ps",".dvi",".pdf"

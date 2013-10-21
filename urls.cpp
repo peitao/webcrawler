@@ -4,6 +4,7 @@
 #include "testtime.h"
 #include "urls.h"
 #include "util.h"
+#include "bloom_filter.h"
 using namespace std;
 typedef map < string, size_t > URLDB;
 
@@ -11,7 +12,8 @@ typedef map < string, size_t > URLDB;
 queue<string> url_queue;
 
 /* 保存目前抓取的所有url */
-static URLDB mDB;
+//static URLDB mDB;
+static BloomFilter mBloom(bloom_filter_size);
 
 /*
     获得一个待抓取的url
@@ -27,7 +29,6 @@ string url_get_url()
 	char buf[1024];
 	sprintf( buf, "queue_size = %u", url_queue.size() );
 	MYDEBUG(buf);
-
 	return url;
 }
 
@@ -69,7 +70,6 @@ void url_put_url( string url )
 
 void url_put_urls( vector< string > & urls)
 {
-	testtime("put urls uese");
 
 	MYDEBUG("begin put urls");
 
@@ -83,15 +83,22 @@ void url_put_urls( vector< string > & urls)
 
 bool url_exist(string url)
 {
-	if ( mDB.find(url) == mDB.end() )
+	/*if ( mDB.find(url) == mDB.end() )
 		return false;
 	else
+	{
+		if ( mBloom.isExist(url) == false )
+			cout << "!!!!!!!!!!!!!!!!! err  " << url <<endl;
 		return true;
+	}*/
+	return mBloom.isExist( url );	
 }
 
 bool url_add(string url)
 {
-	return mDB.insert( URLDB::value_type( url, 1) ).second;
+	mBloom.insert( url );
+	return true;
+	//return mDB.insert( URLDB::value_type( url, 1) ).second;
 }
 
 void test_main_urls()
