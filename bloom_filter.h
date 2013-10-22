@@ -3,12 +3,13 @@
 
 #include <string>
 #include <list>
+#include <boost/utility.hpp>
 
 using std::list;
 using std::string;
 
 /* 主要用于URL的判重复（近似算法） */
-class BloomFilter
+class BloomFilter : boost::noncopyable
 {
 
 public:
@@ -29,11 +30,6 @@ private:
 
 	/* 判断内存中的第index位至0 */
 	inline bool test_bit_index ( size_t index );
-
-	/* 不允许复制和拷贝 */
-	BloomFilter( const BloomFilter & );
-
-	BloomFilter & operator = ( const BloomFilter & );
 
 	/* bloom filter的内存 */
 	char * __p_vec;

@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include "urls.h"
+#include "mutex_lock.h"
 #include "util.h"
 #include "config.h"
 using namespace std;
@@ -16,33 +17,17 @@ using namespace std;
 pthread_t child_threads[thread_numbers];
 
 /* 程序需要使用所有互斥锁 */
-pthread_mutex_t total_pages_lock;
-pthread_mutex_t url_queue_lock;
-pthread_mutex_t mDB_lock;
-
-/* 初始化所有互斥锁 */
-void init_all_lock()
-{
-	if ( pthread_mutex_init( &total_pages_lock, NULL ) )
-		cout << "Init lock fail.." << endl;
-
-	if ( pthread_mutex_init( &url_queue_lock, NULL ) )
-		cout << "Init lock fail.." << endl;
-
-	if ( pthread_mutex_init( &mDB_lock, NULL ) )
-		cout << "Init lock fail.." << endl;
-}
+MutexLock total_pages_lock;
 
 /* 统计信息 */
 size_t total_pages = 0;
+
 /* 获得目前抓取到总页面数（也作为保存页面的文件名字）*/
 size_t get_and_inc()
 {
-	pthread_mutex_lock( &total_pages_lock );
+	MutexLockGuard lock( total_pages_lock );
 
 	size_t ret = total_pages++;
-
-	pthread_mutex_unlock( &total_pages_lock );
 
 	return ret;
 }
@@ -61,9 +46,9 @@ void * worker ( void * p )
 	while ( 1 )
 	{
 		/* 获得一个待抓取的url */
-		pthread_mutex_lock( &url_queue_lock );
+		//pthread_mutex_lock( &url_queue_lock );
 		string curl = url_get_url();
-		pthread_mutex_unlock( &url_queue_lock );
+		//pthread_mutex_unlock( &url_queue_lock );
 
 		if ( curl.size() == 0 ) continue;
 		
@@ -88,9 +73,9 @@ void * worker ( void * p )
 		parse_page( curl.c_str(), buffer, page_size, new_urls );
 
 		/* 将urls加入到全局队列，这里使用url_queue_lock。 */
-		pthread_mutex_lock( &url_queue_lock );
+		//pthread_mutex_lock( &url_queue_lock );
 		url_put_urls ( new_urls );
-		pthread_mutex_unlock( &url_queue_lock );
+		//pthread_mutex_unlock( &url_queue_lock );
 	}
 
 	free( buffer );
@@ -99,9 +84,6 @@ void * worker ( void * p )
 int main (int argc, char const* argv[])
 {
 	
-	/* 初始化锁 */
-	init_all_lock();
-
 	MYDEBUG("init lock done");
 
 	vector< string > seeds;

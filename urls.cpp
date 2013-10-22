@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include "testtime.h"
+#include "mutex_lock.h"
 #include "urls.h"
 #include "util.h"
 #include "bloom_filter.h"
@@ -10,6 +11,7 @@ typedef map < string, size_t > URLDB;
 
 /* 待抓取的url队列 */
 queue<string> url_queue;
+MutexLock url_queue_lock;
 
 /* 保存目前抓取的所有url */
 //static URLDB mDB;
@@ -20,6 +22,8 @@ static BloomFilter mBloom(bloom_filter_size);
  */
 string url_get_url()
 {
+	MutexLockGuard lock ( url_queue_lock );
+
 	if ( url_queue.empty() == true )
 		return string();
 
@@ -71,6 +75,7 @@ void url_put_url( string url )
 void url_put_urls( vector< string > & urls)
 {
 
+	MutexLockGuard lock ( url_queue_lock );
 	MYDEBUG("begin put urls");
 
 	for ( size_t i = 0; i < urls.size(); i++ )
