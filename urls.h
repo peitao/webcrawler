@@ -7,6 +7,7 @@
 using std::string;
 using std::map;
 using std::vector;
+
 bool url_exist(string url);
 
 bool url_add(string url);
