@@ -39,11 +39,13 @@ void * worker ( void * p )
 {
 	MYDEBUG("start a child thread");
 
+
 	char * buffer = (char*)malloc( PAGE_BUFF_SIZE );
 	
 	if ( buffer == NULL )
 		MYDEBUG("malloc ERROR!");
-		
+	
+	curl_global_init(CURL_GLOBAL_ALL);
 	CURL * hander = curl_easy_init();
 
 	while ( 1 )

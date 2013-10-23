@@ -15,7 +15,7 @@ static const char * save_file_prefix = "../save/page";
 static const size_t thread_numbers = 10;
 
 /* 高级配置 */
-//#define DEBUG
+#define DEBUG
 /* 32位最大512MB */
 static const size_t bloom_filter_size = 100 * 1024 * 1024;
 
