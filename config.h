@@ -6,7 +6,7 @@ using std::string;
 /* config */
 
 /* 开始抓取到种子 */
-static const string  seed_url = "hao.360.cn";
+static const string  seed_url = "http://hao.360.cn";
 
 /* 保存抓取到文件的 */
 static const char * save_file_prefix = "../save/page";
@@ -15,6 +15,7 @@ static const char * save_file_prefix = "../save/page";
 static const size_t thread_numbers = 10;
 
 /* 高级配置 */
+//#define DEBUG
 /* 32位最大512MB */
 static const size_t bloom_filter_size = 100 * 1024 * 1024;
 

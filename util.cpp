@@ -87,6 +87,16 @@ string get_host_name(const char * url)
 	
 	return string( start, to );
 }
+/* 返回一个url的相对路径，去掉主机的相对路径 */
+string get_relative_name( const char * url )
+{
+	/* 当前实现是返回第三个/后面的内容。如：http://ddd.cc/xxxx ，返回/xxxx */
+	const char * p = strstr( url + 7 , "/");
+	if ( p == NULL )
+		return string("/");
+	return string ( p );
+}
+
 /* pick out the first url that begin from start */
 string pick_url(const char * start)
 {
@@ -190,38 +200,21 @@ void test_main_util(int argc, char const* argv[])
 	cout<<is_root_path("/haha.com/")<<endl;
 	cout<<is_root_path("haha.com/")<<endl;
 	cout<<is_root_path("haha.com/")<<endl;
+
+	cout << get_relative_name("http://haha.com/wokaile.html" ) << endl;
+	cout << get_relative_name("http://haha.com/woka/ile.html" ) << endl;
+	cout << get_relative_name("http://ww.haha.com/wokaile.html" ) << endl;
+	cout << get_relative_name("http://haha.com/wok///le.html" ) << endl;
+	cout << get_relative_name("http://haha.com/wokai/d/d/le.html" ) << endl;
 	
 }
 
 void debug(string str)
 {
-	return ;
+#ifdef DEBUG
 	std::cerr << str <<endl;
+#endif
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

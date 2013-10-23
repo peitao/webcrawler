@@ -1,5 +1,5 @@
 
-objects =  util.o urls.o bloom_filter.o
+objects =  util.o urls.o bloom_filter.o scheduler.o
 
 libs = `curl-config --libs --cflags`
 
@@ -17,6 +17,7 @@ test_main.o:test_main.cpp *.h
 util.o:util.cpp *.h
 urls.o:urls.cpp *.h
 bloom_filter.o:bloom_filter.cpp *.h
+scheduler.o:scheduler.cpp *.h
 
 clean:
 	rm -f *.o app unittest
