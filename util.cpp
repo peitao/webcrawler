@@ -1,4 +1,7 @@
 #include <iostream>
+#include <iomanip>
+#include <sys/syscall.h>
+#include <sys/types.h>
 #include <curl/curl.h>
 #include <queue>
 #include <string>
@@ -10,6 +13,7 @@
 #include <pthread.h>
 #include "urls.h"
 #include "util.h"
+#include "mutex_lock.h"
 
 using namespace std;
 struct buffer_internel
@@ -48,6 +52,9 @@ size_t fetch_url( void * data_buffer, const char * url, CURL * curl )
 	curl_easy_setopt( curl, CURLOPT_URL, url );
 	curl_easy_setopt( curl, CURLOPT_WRITEFUNCTION, write_data );
 	curl_easy_setopt( curl, CURLOPT_WRITEDATA, &buf_in );
+	
+	/*域名解析，能提高一定的效率，但是curl会崩溃，先留着，先解决IO复用*/
+	//curl_easy_setopt( curl, CURLOPT_TIMEOUT, 5L);
 	
 	/* 从网络读取url对应资源 */
 	if ( curl_easy_perform( curl ) )
@@ -206,14 +213,19 @@ void test_main_util(int argc, char const* argv[])
 	cout << get_relative_name("http://ww.haha.com/wokaile.html" ) << endl;
 	cout << get_relative_name("http://haha.com/wok///le.html" ) << endl;
 	cout << get_relative_name("http://haha.com/wokai/d/d/le.html" ) << endl;
-	
-}
 
+}
+MutexLock lockdebug;
 void debug(string str)
 {
-#ifdef DEBUG
-	std::cerr << str <<endl;
-#endif
+	MutexLockGuard l(lockdebug);
+
+	struct timeval t;
+	gettimeofday(&t,NULL);
+
+	std::cerr << setw(10) << t.tv_sec << " "<< setw(6)  << t.tv_usec << " "
+		  <<syscall(SYS_gettid)<<" \t" 
+		  << str << endl;
 }
 
 

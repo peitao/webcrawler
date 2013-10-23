@@ -10,6 +10,8 @@ using std::vector;
 
 bool url_exist(string url);
 
+bool url_filter ( string url );
+
 bool url_add(string url);
 
 string url_get_url();

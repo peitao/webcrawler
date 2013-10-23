@@ -29,20 +29,26 @@ void test_main_util(int argc, char const* argv[]);
 void debug(string str);
 #ifdef DEBUG
 #define TRACE(x)  TraceDebug _debug__(x);
+#define MYDEBUG(c)  debug(c)
 #endif
 
 #ifndef DEBUG
 #define TRACE(x) 
+#define MYDEBUG(c)
 #endif
 
 class TraceDebug
 {
 public:
-	TraceDebug( string name  ):_name(name){ std::cerr << "Begin " << _name << std::endl; }
-	~TraceDebug() { std::cerr << "End " << _name << std::endl; }
+	TraceDebug( string name  ):_name(name){
+		MYDEBUG( "Begin " + _name  );
+	}
+
+	~TraceDebug() {
+		MYDEBUG( "End " + _name  );
+	}
 	string _name;
 };
-#define MYDEBUG(c)  debug(c)
 
 #endif /* __UTIL_H__ */
 

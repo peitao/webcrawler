@@ -6,6 +6,8 @@
 #include <map>
 #include <queue>
 #include "mutex_lock.h"
+#include "bloom_filter.h"
+#include "urls.h"
 using std::string;
 using std::vector;
 using std::map;
@@ -19,7 +21,7 @@ public:
 
 	string get_url();
 
-	Scheduler():_c_index(0),_total_urls(0){}
+	Scheduler():_c_index(0),_total_urls(0),_mBloom(bloom_filter_size){}
 private:
 
 	void inc_index();
@@ -36,8 +38,11 @@ private:
 	/* 建立主机url到_urldb的索引，便于插入url时查找主机所在位置 */
 	map < string, size_t >   _hostmap;
 	
+	BloomFilter _mBloom;
+
 	/* 互斥锁 */
 	MutexLock _mutex;
+
 };
 
 

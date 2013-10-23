@@ -10,7 +10,12 @@ void Scheduler::add_urls( vector < string > & urls )
 
 	for ( size_t i = 0; i < urls.size(); i++ ) 
 	{
+		if ( url_filter ( urls[i] ) ) continue;
 		
+		if ( _mBloom.isExist( urls[i] ) == true ) continue;
+		
+		_mBloom.insert( urls[i] );
+
 		string host = get_host_name ( urls[i].c_str() );
 		
 		size_t index = find_or_add( host );
