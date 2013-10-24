@@ -7,4 +7,5 @@ using std::map;
 
 bool url_exist(string url);
 bool url_add(string url);
+bool url_filter ( string url );
 #endif /* __URLS_H__ */

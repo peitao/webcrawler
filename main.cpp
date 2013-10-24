@@ -13,7 +13,7 @@ using namespace std;
 const char * seed_url = "hao.360.cn";
 char * save_file_prefix = "../save/page";
 
-const size_t MAX_HANDLER = 200;
+const size_t MAX_HANDLER = 250;
 /* 最大并发数的缓冲池 */
 BuffHandler mbuffer_in[MAX_HANDLER];
 
@@ -72,7 +72,7 @@ void main_a_page(BuffHandler * pbuf)
 	for (size_t i = 0; i < new_urls.size(); i++ )
 	{
 		/* 判断url是否重复 */
-		if ( url_exist( new_urls[i] ) == false )
+		if ( url_filter (new_urls[i]) == false && url_exist( new_urls[i] ) == false )
 		{
 			url_queue.push( new_urls[i] );
 			url_add( new_urls[i] );
